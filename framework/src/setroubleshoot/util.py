@@ -269,12 +269,14 @@ def default_date_text(date):
 
 def get_standard_directories():
     lst = []
-    import rpm
+    import pycman, sys, StringIO
     try:
-        ts = rpm.ts()
-        h = next(ts.dbMatch("name", "filesystem"))
-        for i in h.fiFromHeader():
-            lst.append(i[0])
+        s = StringIO.StringIO()
+        sys.stdout = s
+        pycman.run_action_with_args("query", ["-l", "filesystem"])
+        sys.stdout = sys.__stdout__
+        s = s.getvalue().split()
+        lst = [x for x in s if x != "filesystem"]
     except:
         syslog.syslog(syslog.LOG_ERR, "failed to get filesystem list from rpm")
 
